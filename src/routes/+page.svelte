@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 
-	let texts: { user: string; content: string }[] = [];
+	let texts: { id: number; user: string; content: string }[] = [];
 	let new_message: string;
 	let name: string;
 	let sending = false;
@@ -34,8 +35,10 @@
 		events.addEventListener('message', (event) => {
 			const str = event.data as string;
 			const data = str.split(',');
-			texts.push({ user: data[0], content: data[1] });
-			texts = texts.reverse();
+
+			console.log(str);
+
+			texts = [...texts, { id: parseInt(data[0]), user: data[1], content: data[2] }];
 		});
 	});
 </script>
@@ -43,7 +46,7 @@
 <div class="w-[100vw] h-[100vh] flex justify-center">
 	<div class="flex flex-col h-[100%] justify-between w-[500px]">
 		<div class="overflow-hidden flex flex-col-reverse">
-			{#each texts as text}
+			{#each texts.slice().reverse() as text (text.id)}
 				<div class="text flex">
 					<div class="font-bold text-xl text-pink-400 mx-3">{text.user}</div>
 					<div class="break-all">{text.content}</div>
